@@ -80,6 +80,9 @@ importers:
       react-router-dom:
         specifier: ^6.22.3
         version: 6.22.3(react-dom@18.2.0)(react@18.2.0)
+      sha3:
+        specifier: ^2.1.4
+        version: 2.1.4
       styled-components:
         specifier: ^5.3.6
         version: 5.3.11(@babel/core@7.24.0)(react-dom@18.2.0)(react-is@16.13.1)(react@18.2.0)
@@ -4794,6 +4797,12 @@ packages:
     dependencies:
       inherits: 2.0.4
       safe-buffer: 5.2.1
+    dev: false
+
+  /sha3@2.1.4:
+    resolution: {integrity: sha512-S8cNxbyb0UGUM2VhRD4Poe5N58gJnJsLJ5vC7FYWGUmGhcsj4++WaIOBFVDxlG0W3To6xBuiRh+i0Qp2oNCOtg==}
+    dependencies:
+      buffer: 6.0.3
     dev: false
 
   /shallowequal@1.1.0:
