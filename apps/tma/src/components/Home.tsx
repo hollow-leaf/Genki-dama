@@ -6,14 +6,19 @@ import { WebApp as WebAppVK } from "@vkruglikov/react-telegram-web-app/lib/core/
 import styled from 'styled-components';
 import { TonConnectButton } from "@tonconnect/ui-react";
 import { useTonConnect } from "../hooks/useTonConnect";
-import { buildConnectUrl } from "../utils/urlHelper"
+import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
 import { CHAIN } from "@tonconnect/protocol";
 
 export function Home() {
   const webApp = useWebApp() as WebAppVK;
   const { network } = useTonConnect();
   const [address, setAddress] = useState<string>("{Wallet Address}");
+
   const [connectToken, setConnectToken] = useState("");
+  const [transferToken, setTransferToken] = useState("")
+
+  const [recipient, setRecipient] = useState<string>("");
+  const [amount, setAmount] = useState<string>("0.01");
 
   const openUrl = (url: string) => {
     try {
@@ -29,16 +34,30 @@ export function Home() {
     webApp.showAlert && webApp.showAlert(message);
   }
 
-
   const connect = () => {
     // if (webApp.initData.length === 0) {
     //   alert("Please open the web app in Telegram");
     //   return;
     // }
-    console.log('hello')
     try {
-      // const { token, url } = buildConnectUrl(webApp.initData);
-      const { token, url } = buildConnectUrl('Test'); // For Web Test
+      const { token, url } = buildConnectUrl(webApp.initData);
+      // const { token, url } = buildConnectUrl('Test'); // For Web Test
+      setConnectToken(token);
+      openUrl(url);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const transfer = () => {
+    // if (webApp.initData.length === 0) {
+    //   alert("Please open the web app in Telegram");
+    //   return;
+    // }
+    try {
+      const { token, url } = buildTransferUrl(webApp.initData, recipient, amount);
+      // const { token, url } = buildTransferUrl('Test', recipient, amount); // For Web Test
+      setTransferToken(token)
       openUrl(url);
     } catch (error) {
       console.log(error);
@@ -48,7 +67,6 @@ export function Home() {
   const Title = styled.h1`
     font-size: 1.5em;
     text-align: center;
-    color: white;
   `;
 
   return (
@@ -72,13 +90,13 @@ export function Home() {
               <div style={{ marginBottom: 10 }}>{address}</div>
               <FlexBoxCol>
                 <FlexBoxRow>
-                  <Input placeholder="Recipient"></Input>
+                  <Input placeholder="Recipient" onChange={(e) => { setRecipient(e.currentTarget.value) }}></Input>
                 </FlexBoxRow>
                 <FlexBoxRow>
-                  <Input placeholder="Value"></Input>
+                  <Input placeholder="Amount" onChange={(e) => { setAmount(e.currentTarget.value) }}></Input>
                 </FlexBoxRow>
                 <FlexBoxRow>
-                  <Button onClick={() => { }}>
+                  <Button onClick={transfer}>
                     Transfer
                   </Button>
                 </FlexBoxRow>

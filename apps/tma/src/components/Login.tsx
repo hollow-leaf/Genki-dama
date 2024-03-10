@@ -147,7 +147,7 @@ export function Login() {
       const x = publicKey.get(-2);
       const y = publicKey.get(-3);
       const n = publicKey.get(-1);
-      console.log('curve',{ x, y, crv, alg });
+      console.log('curve', { x, y, crv, alg });
 
       const keyData = {
         kty: "EC",
@@ -189,7 +189,7 @@ export function Login() {
         updatedSignature,
         preimage
       );
-      console.log('result',{ result, updatedSignature });
+      console.log('result', { result, updatedSignature });
 
       const response = await verifyAuthenticationResponse({
         response: authenticationResponse,
@@ -251,14 +251,14 @@ export function Login() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           ></Input>
-           <Button onClick={createNewCredential}>
+          <Button onClick={createNewCredential}>
             Register new account
-            </Button>
+          </Button>
         </FlexBoxRow>
         <FlexBoxRow>
-           <Button onClick={authenticate}>
+          <Button onClick={authenticate}>
             authenticate
-            </Button>
+          </Button>
         </FlexBoxRow>
       </FlexBoxCol>
     </Card>

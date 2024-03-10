@@ -26,10 +26,19 @@ export const generateToken = (initData: string, action: Action) => {
     }
 }
 
+// Note: Don't use for demo
+const miniApp = 'tonauthn_bot'
+
 export const buildConnectUrl = (initData: string) => {
     const token = generateToken(initData, Action.Connect);
-    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(window.location.href)}&miniAppToken=${encodeURIComponent(token)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
-    const url = `${window.location.href}login?_data_=${encodedData}`
+    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(`https://t.me/${miniApp}`)}&miniAppToken=${encodeURIComponent(token)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
+    const url = `${window.location.href.replace(/#.*$/, '')}login?_data_=${encodedData}`
+    return { token, url }
+};
 
+export const buildTransferUrl = (initData: string, recipient: string, amount: string) => {
+    const token = generateToken(initData, Action.Transfer);
+    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(`https://t.me/${miniApp}`)}&miniAppToken=${encodeURIComponent(token)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
+    const url = `${window.location.href.replace(/#.*$/, '')}transfer?_data_=${encodedData}`
     return { token, url }
 };
