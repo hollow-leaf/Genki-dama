@@ -12,7 +12,7 @@ import { CHAIN } from "@tonconnect/protocol";
 export function Home() {
   const webApp = useWebApp() as WebAppVK;
   const { network } = useTonConnect();
-  const [address, setAddress] = useState<string>("{Wallet Address}");
+  const [address, setAddress] = useState<string>("");
 
   const [connectToken, setConnectToken] = useState("");
   const [transferToken, setTransferToken] = useState("")
@@ -44,6 +44,15 @@ export function Home() {
       // const { token, url } = buildConnectUrl('Test'); // For Web Test
       setConnectToken(token);
       openUrl(url);
+      setAddress("Mock Address")
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const disconnect = () => {
+    try {
+      setAddress("")
     } catch (error) {
       console.log(error);
     }
@@ -98,6 +107,11 @@ export function Home() {
                 <FlexBoxRow>
                   <Button onClick={transfer}>
                     Transfer
+                  </Button>
+                </FlexBoxRow>
+                <FlexBoxRow>
+                  <Button onClick={disconnect}>
+                    Disconnect
                   </Button>
                 </FlexBoxRow>
               </FlexBoxCol>
