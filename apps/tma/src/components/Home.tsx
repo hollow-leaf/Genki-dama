@@ -58,7 +58,7 @@ export function Home() {
   const connect = async () => {
     setLoading(true)
     try {
-      const { token, url } = buildConnectUrl(webApp.initData);
+      const { token, url } = buildConnectUrl(webApp.initData, webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0);
       setConnectToken(token);
       openUrl(url);
 

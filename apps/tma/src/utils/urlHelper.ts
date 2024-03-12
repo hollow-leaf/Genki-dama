@@ -26,12 +26,11 @@ export const generateToken = (initData: string, action: Action) => {
     }
 }
 
-// Note: Don't use for demo
-const miniApp = 'tonauthn_bot'
+const miniApp = 'AuthenWalletBot'
 
-export const buildConnectUrl = (initData: string) => {
+export const buildConnectUrl = (initData: string, telegramId: number) => {
     const token = generateToken(initData, Action.Connect);
-    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(`https://t.me/${miniApp}`)}&miniAppToken=${encodeURIComponent(token)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
+    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(`https://t.me/${miniApp}`)}&telegramId=${encodeURIComponent(telegramId)}&miniAppToken=${encodeURIComponent(token)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
     const url = `${window.location.href.replace(/#.*$/, '')}login?_data_=${encodedData}`
     return { token, url }
 };

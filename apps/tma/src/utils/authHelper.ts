@@ -1,4 +1,19 @@
 import * as cborx from "cbor-x";
+import { useState } from "react";
+import { ECDSASigValue } from "@peculiar/asn1-ecc";
+import { AsnParser } from "@peculiar/asn1-schema";
+import base64 from "@hexagon/base64";
+import {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  VerifiedRegistrationResponse,
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse,
+} from "@simplewebauthn/server";
+import {
+  startAuthentication,
+  startRegistration,
+} from "@simplewebauthn/browser";
 
 const encoder = new cborx.Encoder({
   mapsAsObjects: false,
@@ -91,4 +106,105 @@ export function parseAuthenticatorData(authData: Uint8Array) {
 
 export function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
   return bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0;
+}
+
+async function signMessage(message: Uint8Array, authenId: string) {
+  const fetched = localStorage.getItem(authenId);
+    if (!fetched) {
+      throw new Error("Credential not stored. Please try registering again!");
+  }
+  const authenticator = JSON.parse(fetched);
+  const publicKey = decodeFirst<any>(
+    Uint8Array.from(authenticator.credentialPublicKey)
+  );
+
+  try {
+    const authenticationOptions = await generateAuthenticationOptions({
+      rpID: window.location.hostname,
+      challenge: message,  
+    });
+    const authenticationResponse = await startAuthentication(
+      authenticationOptions
+    );
+    const clientDataJSON = base64.toArrayBuffer(
+      authenticationResponse.response.clientDataJSON,
+      true
+    );
+    const authenticatorData = base64.toArrayBuffer(
+      authenticationResponse.response.authenticatorData,
+      true
+    );
+    const signature = base64.toArrayBuffer(
+      authenticationResponse.response.signature,
+      true
+    );
+
+    const hashedClientData = await window.crypto.subtle.digest(
+      "SHA-256",
+      clientDataJSON
+    );
+    const preimage = concatUint8Arrays(
+      new Uint8Array(authenticatorData),
+      new Uint8Array(hashedClientData)
+    );
+
+    //verify the signature and public be choosen match
+    const kty = publicKey.get(1);
+    const alg = publicKey.get(3);
+    const crv = publicKey.get(-1);
+    const x = publicKey.get(-2);
+    const y = publicKey.get(-3);
+    const n = publicKey.get(-1);
+
+    const keyData = {
+      kty: "EC",
+      crv: "P-256",
+      x: base64.fromArrayBuffer(x, true),
+      y: base64.fromArrayBuffer(y, true),
+      ext: false,
+    };
+
+    const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
+    let rBytes = new Uint8Array(parsedSignature.r);
+    let sBytes = new Uint8Array(parsedSignature.s);
+
+    if (shouldRemoveLeadingZero(rBytes)) {
+      rBytes = rBytes.slice(1);
+    }
+
+    if (shouldRemoveLeadingZero(sBytes)) {
+      sBytes = sBytes.slice(1);
+    }
+
+    // const finalSignature = isoUint8Array.concat([rBytes, sBytes]);
+    const updatedSignature = concatUint8Arrays(rBytes, sBytes);
+
+    const key = await window.crypto.subtle.importKey(
+      "jwk",
+      keyData,
+      {
+        name: "ECDSA",
+        namedCurve: "P-256",
+      },
+      false,
+      ["verify"]
+    );
+
+    const result = await window.crypto.subtle.verify(
+      { hash: { name: "SHA-256" }, name: "ECDSA" },
+      key,
+      updatedSignature,
+      preimage
+    );
+
+    if(!result) {
+      alert("Wrong passkey provided")
+      return ""
+    }
+    //return what
+    return {clientDataJSON: clientDataJSON, authenticationResponse: authenticationResponse}
+  } catch(e) {
+    console.log(e)
+    return ""
+  }
 }

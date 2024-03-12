@@ -9,5 +9,6 @@ export default defineConfig({
   base: ((process.env.GITHUB_REPOSITORY ?? "") + "/").match(/(\/.*)/)?.[1],
   resolve: {
     alias: [{ find: "src", replacement: resolve(__dirname, "./src") }]
-  }
+  },
+  
 });
