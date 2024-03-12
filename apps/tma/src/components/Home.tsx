@@ -8,6 +8,7 @@ import { TonConnectButton } from "@tonconnect/ui-react";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
 import { CHAIN } from "@tonconnect/protocol";
+import { webAppContext } from "@vkruglikov/react-telegram-web-app/lib/core";
 
 export function Home() {
   const webApp = useWebApp() as WebAppVK;
@@ -29,10 +30,14 @@ export function Home() {
     }
   }
 
+  
+
   const showAlert = (message: string) => {
     if (!webApp) console.log("webApp is not defined")
     webApp.showAlert && webApp.showAlert(message);
   }
+
+
 
   const connect = () => {
     // if (webApp.initData.length === 0) {
@@ -57,6 +62,7 @@ export function Home() {
       console.log(error);
     }
   }
+  
 
   const transfer = () => {
     // if (webApp.initData.length === 0) {
@@ -92,6 +98,8 @@ export function Home() {
       </FlexBoxRow>
       <Card>
         <FlexBoxCol>
+          <Title>User</Title>
+          {webApp.initDataUnsafe.user?.id}
           <Title>Authen Wallet</Title>
           {address ? (
             <div>
