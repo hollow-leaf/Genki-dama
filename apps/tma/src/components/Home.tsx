@@ -20,6 +20,8 @@ export function Home() {
   const [transferToken, setTransferToken] = useState("")
   const [recipient, setRecipient] = useState<string>("");
   const [amount, setAmount] = useState<string>("0.01");
+  const [count, setCount] = useState<number>(0);
+
 
   const openUrl = (url: string) => {
     try {
@@ -76,6 +78,7 @@ export function Home() {
         }
         useQuery('getAddressBytelegramId');
         tryCount += 1;
+        setCount(tryCount)
         await sleep(2000);
       }
     } catch (error) {
@@ -126,6 +129,7 @@ export function Home() {
         </Button>
       </FlexBoxRow>
       <Card>
+        <div>Retry Count: {count}</div>
         <FlexBoxCol>
           {address ? (
             <div>
