@@ -20,8 +20,6 @@ export function Home() {
   const [transferToken, setTransferToken] = useState("")
   const [recipient, setRecipient] = useState<string>("");
   const [amount, setAmount] = useState<string>("0.01");
-  const [count, setCount] = useState<number>(0);
-
 
   const openUrl = (url: string) => {
     try {
@@ -71,15 +69,20 @@ export function Home() {
       openUrl(url);
 
       var tryCount = 0;
-      while(address == "") {
-        if(tryCount > 10) {
+      var addressVer = ""
+      while(addressVer == "") {
+        if(tryCount > 40) {
           showAlert("Connect Time Out!")
           return
         }
-        useQuery('getAddressBytelegramId');
+        await getAddressBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0).then((res:any) => {
+          if(res.publicKey != "") {
+            setAddress(res.contractAddress)
+            addressVer = res.contractAddress
+          }
+        })
         tryCount += 1;
-        setCount(tryCount)
-        await sleep(2000);
+        await sleep(3500);
       }
     } catch (error) {
       console.log(error);
@@ -129,7 +132,6 @@ export function Home() {
         </Button>
       </FlexBoxRow>
       <Card>
-        <div>Retry Count: {count}</div>
         <FlexBoxCol>
           {address ? (
             <div>
