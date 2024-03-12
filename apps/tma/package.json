@@ -30,6 +30,7 @@
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.22.3",
+    "react-spinners": "^0.13.8",
     "sha3": "^2.1.4",
     "styled-components": "^5.3.6",
     "ton": "13.3.0",
