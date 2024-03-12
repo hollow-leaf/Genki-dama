@@ -37,12 +37,13 @@ export function Home() {
         getAddressBytelegramId(webApp.initDataUnsafe.user.id).then((res:any) => {
           if(res.publicKey != "") {
             setAddress(res.contractAddress)
+            return true
           }
         })
+        return false
       }
+      return false
     },
-    cacheTime: 10000,
-    staleTime: 5000,
   })
 
   
@@ -52,9 +53,11 @@ export function Home() {
     webApp.showAlert && webApp.showAlert(message);
   }
 
+  const sleep = (milliseconds: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  };
 
-
-  const connect = () => {
+  const connect = async () => {
     // if (webApp.initData.length === 0) {
     //   alert("Please open the web app in Telegram");
     //   return;
@@ -64,6 +67,17 @@ export function Home() {
       // const { token, url } = buildConnectUrl('Test'); // For Web Test
       setConnectToken(token);
       openUrl(url);
+
+      var tryCount = 0;
+      while(address == "") {
+        if(tryCount > 10) {
+          showAlert("Connect Time Out!")
+          return
+        }
+        useQuery('getAddressBytelegramId');
+        tryCount += 1;
+        await sleep(2000);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -113,9 +127,6 @@ export function Home() {
       </FlexBoxRow>
       <Card>
         <FlexBoxCol>
-          <Title>User</Title>
-          {webApp.initDataUnsafe.user?.id}
-          <Title>Authen Wallet</Title>
           {address ? (
             <div>
               <div>Address: </div>
