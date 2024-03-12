@@ -4,7 +4,7 @@ const  headers = {
 }
 
 //serverless call
-const HOST = "https://psyduck-app.wayneies1206.workers.dev"
+const HOST = "https://authenwallet.wayneies1206.workers.dev"
 
 export async function getAddressBytelegramId(telegramId:number) {
     try {
