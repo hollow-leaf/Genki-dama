@@ -11,15 +11,21 @@ import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
 import { CHAIN } from "@tonconnect/protocol";
 import { webAppContext } from "@vkruglikov/react-telegram-web-app/lib/core";
 import { deleteBytelegramId, getAddressBytelegramId } from "../services/api";
+import Loading from "./loading";
+import { createPortal } from "react-dom";
+import { Modal } from "./modal";
+
 
 export function Home() {
   const webApp = useWebApp() as WebAppVK;
   const { network } = useTonConnect();
   const [address, setAddress] = useState<string>("");
+  const [publicKey, setPublicKey] = useState<string>("");
   const [connectToken, setConnectToken] = useState("");
   const [transferToken, setTransferToken] = useState("")
   const [recipient, setRecipient] = useState<string>("");
   const [amount, setAmount] = useState<string>("0.01");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const openUrl = (url: string) => {
     try {
@@ -37,6 +43,7 @@ export function Home() {
         getAddressBytelegramId(webApp.initDataUnsafe.user.id).then((res:any) => {
           if(res.publicKey != "") {
             setAddress(res.contractAddress)
+            setPublicKey(res.publicKey)
             return true
           }
         })
@@ -62,6 +69,7 @@ export function Home() {
     //   alert("Please open the web app in Telegram");
     //   return;
     // }
+    setLoading(true)
     try {
       const { token, url } = buildConnectUrl(webApp.initData);
       // const { token, url } = buildConnectUrl('Test'); // For Web Test
@@ -73,12 +81,14 @@ export function Home() {
       while(addressVer == "") {
         if(tryCount > 40) {
           showAlert("Connect Time Out!")
+          setLoading(false)
           return
         }
         await getAddressBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0).then((res:any) => {
           if(res.publicKey != "") {
             setAddress(res.contractAddress)
             addressVer = res.contractAddress
+            setLoading(false)
           }
         })
         tryCount += 1;
@@ -86,6 +96,7 @@ export function Home() {
       }
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   }
 
@@ -97,6 +108,8 @@ export function Home() {
       console.log(error);
     }
   }
+
+  const closeModal = () => {setLoading(false)}
   
 
   const transfer = () => {
@@ -105,7 +118,7 @@ export function Home() {
     //   return;
     // }
     try {
-      const { token, url } = buildTransferUrl(webApp.initData, recipient, amount);
+      const { token, url } = buildTransferUrl(webApp.initData, recipient, amount, publicKey);
       // const { token, url } = buildTransferUrl('Test', recipient, amount); // For Web Test
       setTransferToken(token)
       openUrl(url);
@@ -114,23 +127,8 @@ export function Home() {
     }
   }
 
-  const Title = styled.h1`
-    font-size: 1.5em;
-    text-align: center;
-  `;
-
   return (
     <>
-      <FlexBoxRow>
-        <TonConnectButton />
-        <Button>
-          {network
-            ? network === CHAIN.MAINNET
-              ? "mainnet"
-              : "testnet"
-            : "N/A"}
-        </Button>
-      </FlexBoxRow>
       <Card>
         <FlexBoxCol>
           {address ? (
@@ -167,6 +165,7 @@ export function Home() {
           )}
         </FlexBoxCol >
       </Card >
+     {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </>
   );
 }
