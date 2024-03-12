@@ -4,16 +4,12 @@ import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import { useWebApp } from "@vkruglikov/react-telegram-web-app"
 import { WebApp as WebAppVK } from "@vkruglikov/react-telegram-web-app/lib/core/twa-types";
-import styled from 'styled-components';
-import { TonConnectButton } from "@tonconnect/ui-react";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
-import { CHAIN } from "@tonconnect/protocol";
-import { webAppContext } from "@vkruglikov/react-telegram-web-app/lib/core";
 import { deleteBytelegramId, getAddressBytelegramId } from "../services/api";
-import Loading from "./loading";
 import { createPortal } from "react-dom";
 import { Modal } from "./modal";
+import { mnemonicToWalletKey } from "ton-crypto";
 
 
 export function Home() {
@@ -44,16 +40,11 @@ export function Home() {
           if(res.publicKey != "") {
             setAddress(res.contractAddress)
             setPublicKey(res.publicKey)
-            return true
           }
         })
-        return false
       }
-      return false
     },
   })
-
-  
 
   const showAlert = (message: string) => {
     if (!webApp) console.log("webApp is not defined")
@@ -65,14 +56,9 @@ export function Home() {
   };
 
   const connect = async () => {
-    // if (webApp.initData.length === 0) {
-    //   alert("Please open the web app in Telegram");
-    //   return;
-    // }
     setLoading(true)
     try {
       const { token, url } = buildConnectUrl(webApp.initData);
-      // const { token, url } = buildConnectUrl('Test'); // For Web Test
       setConnectToken(token);
       openUrl(url);
 
@@ -112,17 +98,40 @@ export function Home() {
   const closeModal = () => {setLoading(false)}
   
 
-  const transfer = () => {
-    // if (webApp.initData.length === 0) {
-    //   alert("Please open the web app in Telegram");
-    //   return;
-    // }
+  const transfer = async () => {
     try {
+      setLoading(true)
+
+      //publicKey+Tx+Timestamp
+      const hashedTxDataLabel = await window.crypto.subtle.digest(
+        "SHA-256",
+        Buffer.from("")
+      );
+
       const { token, url } = buildTransferUrl(webApp.initData, recipient, amount, publicKey);
-      // const { token, url } = buildTransferUrl('Test', recipient, amount); // For Web Test
       setTransferToken(token)
       openUrl(url);
+
+      var tryCount = 0;
+      var txHash = ""
+      while(txHash == "") {
+        if(tryCount > 40) {
+          showAlert("Connect Time Out!")
+          setLoading(false)
+          return
+        }
+        await getAddressBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0).then((res:any) => {
+          if(res.publicKey != "") {
+            setAddress(res.contractAddress)
+            txHash = res.contractAddress
+            setLoading(false)
+          }
+        })
+        tryCount += 1;
+        await sleep(3500);
+      }
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   }
