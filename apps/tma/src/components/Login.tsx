@@ -77,12 +77,12 @@ export function Login() {
     }
   }
 
-  async function authenticate() {
+  async function authenticate(unsignData: string) {
     setError("");
     try {
       const authenticationOptions = await generateAuthenticationOptions({
         rpID: window.location.hostname,
-        challenge: "asdf",
+        challenge: unsignData,  
       });
       const authenticationResponse = await startAuthentication(
         authenticationOptions
@@ -224,18 +224,12 @@ export function Login() {
         s: BigInt('0x' + Array.from(new Uint8Array(sBytes)).reverse().map(x => x.toString(16).padStart(2, '0')).join('')),
         pubkey_x: BigInt('0x' + Array.from(new Uint8Array(x)).reverse().map(x => x.toString(16).padStart(2, '0')).join('')),
         pubkey_y: BigInt('0x' + Array.from(new Uint8Array(y)).reverse().map(x => x.toString(16).padStart(2, '0')).join('')),
-        msghash: BigInt('0x' + Array.from(new Uint8Array(hashedMessage)).reverse().map(x => x.toString(16).padStart(2, '0')).join('')),
+        msghash: BigInt('0x' + Array.from(new Uint8Array(hashedMessage)).map(x => x.toString(16).padStart(2, '0')).join('')),
       }
-      console.log('public key', compressPublicKey(a.pubkey_x, a.pubkey_y))
-      console.log('signature', a.s)
-      // Inputs need to be little-endian
-      // const { data: proof } = await axios.post(`${API_URL}/prove_evm`, {
-      //   r: Array.from(new Uint8Array(rBytes)).reverse(),
-      //   s: Array.from(new Uint8Array(sBytes)).reverse(),
-      //   pubkey_x: Array.from(new Uint8Array(x)).reverse(),
-      //   pubkey_y: Array.from(new Uint8Array(y)).reverse(),
-      //   msghash: Array.from(new Uint8Array(hashedMessage)).reverse(),
-      // });
+
+      const pk = compressPublicKey(a.pubkey_x, a.pubkey_y)
+
+      return {a, pk}
 
     } catch (e) {
       setError((e as any).message || "An unknown error occurred");
@@ -256,7 +250,7 @@ export function Login() {
           </Button>
         </FlexBoxRow>
         <FlexBoxRow>
-          <Button onClick={authenticate}>
+          <Button onClick={() => authenticate("your_unsign_data_here")}>
             authenticate
           </Button>
         </FlexBoxRow>
