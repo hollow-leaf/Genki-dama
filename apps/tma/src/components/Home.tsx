@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState,  } from "react";
+import { useQuery } from "react-query"
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
 import { useWebApp } from "@vkruglikov/react-telegram-web-app"
@@ -9,15 +10,14 @@ import { useTonConnect } from "../hooks/useTonConnect";
 import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
 import { CHAIN } from "@tonconnect/protocol";
 import { webAppContext } from "@vkruglikov/react-telegram-web-app/lib/core";
+import { deleteBytelegramId, getAddressBytelegramId } from "../services/api";
 
 export function Home() {
   const webApp = useWebApp() as WebAppVK;
   const { network } = useTonConnect();
   const [address, setAddress] = useState<string>("");
-
   const [connectToken, setConnectToken] = useState("");
   const [transferToken, setTransferToken] = useState("")
-
   const [recipient, setRecipient] = useState<string>("");
   const [amount, setAmount] = useState<string>("0.01");
 
@@ -29,6 +29,21 @@ export function Home() {
       console.log(error);
     }
   }
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["getAddressBytelegramId"],
+    queryFn: () => {
+      if(webApp.initDataUnsafe.user?.id) {
+        getAddressBytelegramId(webApp.initDataUnsafe.user.id).then((res:any) => {
+          if(res.publicKey != "") {
+            setAddress(res.contractAddress)
+          }
+        })
+      }
+    },
+    cacheTime: 10000,
+    staleTime: 5000,
+  })
 
   
 
@@ -49,7 +64,6 @@ export function Home() {
       // const { token, url } = buildConnectUrl('Test'); // For Web Test
       setConnectToken(token);
       openUrl(url);
-      setAddress("Mock Address")
     } catch (error) {
       console.log(error);
     }
@@ -58,6 +72,7 @@ export function Home() {
   const disconnect = () => {
     try {
       setAddress("")
+      deleteBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0)
     } catch (error) {
       console.log(error);
     }
