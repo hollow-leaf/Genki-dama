@@ -111,7 +111,8 @@ export function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
 export async function signMessage(message: Uint8Array, authenId: string) {
   const fetched = localStorage.getItem(authenId);
     if (!fetched) {
-      throw new Error("Credential not stored. Please try registering again!");
+      alert("Credential not stored. Please try registering again!");
+      return
   }
   const authenticator = JSON.parse(fetched);
   const publicKey = decodeFirst<any>(

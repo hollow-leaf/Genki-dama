@@ -1,4 +1,4 @@
-import { useState,  } from "react";
+import { useEffect, useState,  } from "react";
 import { useQuery } from "react-query"
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import WebApp from "@twa-dev/sdk";
@@ -6,10 +6,11 @@ import { useWebApp } from "@vkruglikov/react-telegram-web-app"
 import { WebApp as WebAppVK } from "@vkruglikov/react-telegram-web-app/lib/core/twa-types";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
-import { deleteBytelegramId, getAddressBytelegramId, getTxResult } from "../services/api";
+import { deleteBytelegramId, getAddressBytelegramId, getBalanceByAddr, getTxResult } from "../services/api";
 import { createPortal } from "react-dom";
 import { Modal } from "./modal";
 import { mnemonicToWalletKey } from "ton-crypto";
+import { formatAddr } from "../utils/utils";
 
 
 export function Home() {
@@ -22,6 +23,7 @@ export function Home() {
   const [amount, setAmount] = useState<string>("0.01");
   const [loading, setLoading] = useState<boolean>(false);
   const [authenId, setAuthenId] = useState<string>("");
+  const [balance, setBalance] = useState<number>(0);
 
   const openUrl = (url: string) => {
     try {
@@ -32,6 +34,10 @@ export function Home() {
     }
   }
 
+  useEffect(() => {
+    
+  }, [])
+
   const { isLoading, error, data } = useQuery({
     queryKey: ["getAddressBytelegramId"],
     queryFn: () => {
@@ -41,11 +47,19 @@ export function Home() {
             setAddress(res.contractAddress)
             setPublicKey(res.publicKey)
             setAuthenId(res.authenId)
+            updateBalance(res.contractAddress)
           }
         })
       }
     },
   })
+
+  const updateBalance = (addr: string)=> {
+    try {
+      const _balance = getBalanceByAddr(addr)
+      setBalance(Number(_balance));
+    } catch(e) {}
+  }
 
   const showAlert = (message: string) => {
     if (!webApp) console.log("webApp is not defined")
@@ -77,6 +91,7 @@ export function Home() {
             setPublicKey(res.publicKey)
             setAuthenId(res.authenId)
             addressVer = res.contractAddress
+            updateBalance(res.contractAddress)
             setLoading(false)
           }
         })
@@ -94,6 +109,7 @@ export function Home() {
       setAddress("")
       setPublicKey("")
       setAuthenId("")
+      setBalance(0)
       deleteBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0)
     } catch (error) {
       console.log(error);
@@ -152,8 +168,8 @@ export function Home() {
         <FlexBoxCol>
           {address ? (
             <div>
-              <div>Address: </div>
-              <div style={{ marginBottom: 10 }}>{address}</div>
+              <div className= "madimi-one-regular" style={{ "marginBottom": 10, "width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
+              <div className= "madimi-one-regular" style={{ "marginBottom": 10, "width": "100%", "textAlign": "center", "color": "GrayText" }}>{formatAddr(address)}</div>
               <FlexBoxCol>
                 <FlexBoxRow>
                   <Input placeholder="Recipient" onChange={(e) => { setRecipient(e.currentTarget.value) }}></Input>
@@ -161,12 +177,12 @@ export function Home() {
                 <FlexBoxRow>
                   <Input placeholder="Amount" onChange={(e) => { setAmount(e.currentTarget.value) }}></Input>
                 </FlexBoxRow>
-                <FlexBoxRow>
+                <FlexBoxRow style={{"justifyContent": "center", "width": "100%"}}>
                   <Button onClick={transfer}>
                     Transfer
                   </Button>
                 </FlexBoxRow>
-                <FlexBoxRow>
+                <FlexBoxRow style={{"justifyContent": "center", "width": "100%", "opacity": "80%"}}>
                   <Button onClick={disconnect}>
                     Disconnect
                   </Button>

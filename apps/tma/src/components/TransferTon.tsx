@@ -45,7 +45,7 @@ export function TransferTon() {
     transaction[0] = 42;
     const authenResult = await signMessage(utf8Encode.encode(unsignedMessage.bits.toString()), authenId)
     setLoading(true)
-    if(authenResult != "") {
+    if(authenResult != "" && authenResult != undefined) {
       const signedBody= beginCell()
       .storeUint(BigInt('0x' + Array.from(authenResult.Signature).map(x => x.toString(16).padStart(2, '0')).join('').substring(0, 64)), 256)
       .storeUint(BigInt('0x' + Array.from(authenResult.Signature).map(x => x.toString(16).padStart(2, '0')).join('').substring(64, 128)), 256)
@@ -58,7 +58,7 @@ export function TransferTon() {
       setLoading(false)
       alert("Signed failed")
     }
-    window.open(miniAppUrl)
+    window.location.href = (miniAppUrl)
   }
 
   return (
