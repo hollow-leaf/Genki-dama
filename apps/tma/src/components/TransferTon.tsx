@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SendMode, beginCell } from "@ton/core";
+import { SendMode, beginCell, Address } from "@ton/core";
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import { AuthenWallet } from "../services/ton/tonService";
 import { signMessage } from "../utils/authHelper";
@@ -13,12 +13,9 @@ export function TransferTon() {
   const [miniAppToken, setMiniAppToken] = useState("");
   const [tonAmount, setTonAmount] = useState("");
   const [tonRecipient, setTonRecipient] = useState("");
-  const [address, setAddress] = useState<string>("");
-  const [balance, setBalance] = useState<number>(0);
   const [publicKey, setPublicKey] = useState("");
   const [authenId, setAuthenId] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
 
   useEffect(() => {
     let search = window.location.search;
@@ -36,6 +33,13 @@ export function TransferTon() {
   const closeModal = () => {setLoading(false)}
 
   const transfer = async () => {
+    try {
+      const testAddr = Address.parse(tonRecipient)
+    } catch(e) {
+      console.log(e)
+      alert("Error Recipient Address")
+      return
+    }
     // Mock Transaction
     const authenWallet = new AuthenWallet(0, publicKey, 9453);
     const internalMessage = authenWallet.createTransferInternalMessage(Number(tonAmount), tonRecipient);
