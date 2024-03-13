@@ -54,9 +54,9 @@ export function Home() {
     },
   })
 
-  const updateBalance = (addr: string)=> {
+  const updateBalance = async (addr: string)=> {
     try {
-      const _balance = getBalanceByAddr(addr)
+      const _balance = await getBalanceByAddr(addr)
       setBalance(Number(_balance));
     } catch(e) {}
   }
@@ -168,7 +168,7 @@ export function Home() {
         <FlexBoxCol>
           {address != "" ? (
             <div>
-              <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
+              <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "marginTop": "60px","width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
               <div className= "madimi-one-regular" style={{ "marginBottom": "40px", "width": "100%", "textAlign": "center", "color": "GrayText" }}>{formatAddr(address)}</div>
               <FlexBoxCol>
                 <FlexBoxRow>
