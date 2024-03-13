@@ -6,7 +6,7 @@ import { useWebApp } from "@vkruglikov/react-telegram-web-app"
 import { WebApp as WebAppVK } from "@vkruglikov/react-telegram-web-app/lib/core/twa-types";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
-import { deleteBytelegramId, getAddressBytelegramId } from "../services/api";
+import { deleteBytelegramId, getAddressBytelegramId, getTxResult } from "../services/api";
 import { createPortal } from "react-dom";
 import { Modal } from "./modal";
 import { mnemonicToWalletKey } from "ton-crypto";
@@ -14,7 +14,6 @@ import { mnemonicToWalletKey } from "ton-crypto";
 
 export function Home() {
   const webApp = useWebApp() as WebAppVK;
-  const { network } = useTonConnect();
   const [address, setAddress] = useState<string>("");
   const [publicKey, setPublicKey] = useState<string>("");
   const [connectToken, setConnectToken] = useState("");
@@ -22,6 +21,7 @@ export function Home() {
   const [recipient, setRecipient] = useState<string>("");
   const [amount, setAmount] = useState<string>("0.01");
   const [loading, setLoading] = useState<boolean>(false);
+  const [authenId, setAuthenId] = useState<string>("");
 
   const openUrl = (url: string) => {
     try {
@@ -40,6 +40,7 @@ export function Home() {
           if(res.publicKey != "") {
             setAddress(res.contractAddress)
             setPublicKey(res.publicKey)
+            setAuthenId(res.authenId)
           }
         })
       }
@@ -73,6 +74,8 @@ export function Home() {
         await getAddressBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0).then((res:any) => {
           if(res.publicKey != "") {
             setAddress(res.contractAddress)
+            setPublicKey(res.publicKey)
+            setAuthenId(res.authenId)
             addressVer = res.contractAddress
             setLoading(false)
           }
@@ -89,6 +92,8 @@ export function Home() {
   const disconnect = () => {
     try {
       setAddress("")
+      setPublicKey("")
+      setAuthenId("")
       deleteBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0)
     } catch (error) {
       console.log(error);
@@ -102,28 +107,32 @@ export function Home() {
     try {
       setLoading(true)
 
-      //publicKey+Tx+Timestamp
+      //publicKey+Tx+
+      const timeNow = new Date()
       const hashedTxDataLabel = await window.crypto.subtle.digest(
         "SHA-256",
-        Buffer.from("")
+        Buffer.from(recipient+amount+timeNow.toISOString())
       );
+      let HashedTxDataLabel = Array.from(new Uint8Array(hashedTxDataLabel)).map(x => x.toString(16)).join('');
 
-      const { token, url } = buildTransferUrl(webApp.initData, recipient, amount, publicKey);
+      const { token, url } = buildTransferUrl(webApp.initData, recipient, amount, publicKey, HashedTxDataLabel, authenId);
       setTransferToken(token)
       openUrl(url);
 
       var tryCount = 0;
-      var txHash = ""
-      while(txHash == "") {
+      var txResult = ""
+      while(txResult == "") {
         if(tryCount > 40) {
           showAlert("Connect Time Out!")
           setLoading(false)
           return
         }
-        await getAddressBytelegramId(webApp.initDataUnsafe.user?webApp.initDataUnsafe.user.id:0).then((res:any) => {
-          if(res.publicKey != "") {
-            setAddress(res.contractAddress)
-            txHash = res.contractAddress
+        await getTxResult(HashedTxDataLabel).then((res:any) => {
+          if(res.result == "success") {
+            txResult = "success"
+            setLoading(false)
+          } else if(res.result == "failed") {
+            txResult = "failed"
             setLoading(false)
           }
         })

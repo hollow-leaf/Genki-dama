@@ -35,9 +35,9 @@ export const buildConnectUrl = (initData: string, telegramId: number) => {
     return { token, url }
 };
 
-export const buildTransferUrl = (initData: string, recipient: string, amount: string, publicKey: string) => {
+export const buildTransferUrl = (initData: string, recipient: string, amount: string, publicKey: string, hashedTxDataLabel: string, authenId: string) => {
     const token = generateToken(initData, Action.Transfer);
-    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(`https://t.me/${miniApp}`)}&miniAppToken=${encodeURIComponent(token)}&publicKey=${encodeURIComponent(publicKey)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
+    const encodedData = encodeURIComponent(`?miniAppURL=${encodeURIComponent(`https://t.me/${miniApp}`)}&authenId=${encodeURIComponent(authenId)}&miniAppToken=${encodeURIComponent(token)}&hashedTxDataLabel=${encodeURIComponent(hashedTxDataLabel)}&publicKey=${encodeURIComponent(publicKey)}&recipient=${encodeURIComponent(recipient)}&amount=${encodeURIComponent(amount)}&callbackUrl=${encodeURIComponent(window.location.href)}`);
     const url = `${window.location.href.replace(/#.*$/, '')}transfer?_data_=${encodedData}`
     return { token, url }
 };

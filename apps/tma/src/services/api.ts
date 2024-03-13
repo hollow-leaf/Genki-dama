@@ -33,14 +33,14 @@ export async function getAddressBytelegramId(telegramId:number) {
           })
         if(res){
             const rres = await res.json()
-            return {publicKey: rres.publicKey, contractAddress: rres.contractAddress}
+            return {publicKey: rres.publicKey, contractAddress: rres.contractAddress, authenId: rres.authenId}
         }else{
-            return {publicKey: "", contractAddress: ""}
+            return {publicKey: "", contractAddress: "", authenId: ""}
         }
     }
     catch (err) {
         console.log("error", err);
-        return {publicKey: "", contractAddress: ""}
+        return {publicKey: "", contractAddress: "", authenId: ""}
     }
 }
 
@@ -60,12 +60,13 @@ export async function deleteBytelegramId(telegramId:number) {
     }
 }
 
-export async function updateAddressBytelegramId(telegramId:string, publicKey:string, contractAddress:string) {
+export async function updateAddressBytelegramId(telegramId:string, publicKey:string, contractAddress:string,  authenId:string) {
     try {
         let body = {
             "telegramId": telegramId,
             "publicKey": publicKey,
-            "contractAddress": contractAddress
+            "contractAddress": contractAddress,
+            "authenId": authenId
         }
         const res = await fetch(HOST + '/updateUserInfo', {
             method: 'POST',
@@ -73,7 +74,7 @@ export async function updateAddressBytelegramId(telegramId:string, publicKey:str
             body: JSON.stringify(body)
           })
         if(res){
-            const rres = await res.json()
+            const rres = await res
             return true
         }else{
             return false
@@ -82,5 +83,45 @@ export async function updateAddressBytelegramId(telegramId:string, publicKey:str
     catch (err) {
         console.log("error", err);
         return false
+    }
+}
+
+export async function getTxResult(hashedTxDataLabel: string) {
+    try {
+        let body = {
+            "hashedTxDataLabel": hashedTxDataLabel
+        }
+        const res = await fetch(HOST + '/txResult', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          })
+        if(res){
+            const rres = await res.json()
+            return {result: rres.result}
+        }else{
+            return {result: "failed"}
+        }
+    }
+    catch (err) {
+        console.log("error", err);
+        return {result: "failed"}
+    }
+}
+
+export async function updateTxResult(hashedTxDataLabel: string) {
+    try {
+        let body = {
+            "hashedTxDataLabel": hashedTxDataLabel,
+            "result" : "success"
+        }
+        const res = await fetch(HOST + '/updateTxResult', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          })
+    }
+    catch (err) {
+        console.log("error", err);
     }
 }
