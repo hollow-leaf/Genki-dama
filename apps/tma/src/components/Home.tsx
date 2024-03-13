@@ -166,10 +166,10 @@ export function Home() {
     <>
       <Card>
         <FlexBoxCol>
-          {address ? (
+          {address != "" ? (
             <div>
-              <div className= "madimi-one-regular" style={{ "marginBottom": 10, "width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
-              <div className= "madimi-one-regular" style={{ "marginBottom": 10, "width": "100%", "textAlign": "center", "color": "GrayText" }}>{formatAddr(address)}</div>
+              <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
+              <div className= "madimi-one-regular" style={{ "marginBottom": "40px", "width": "100%", "textAlign": "center", "color": "GrayText" }}>{formatAddr(address)}</div>
               <FlexBoxCol>
                 <FlexBoxRow>
                   <Input placeholder="Recipient" onChange={(e) => { setRecipient(e.currentTarget.value) }}></Input>
@@ -177,8 +177,8 @@ export function Home() {
                 <FlexBoxRow>
                   <Input placeholder="Amount" onChange={(e) => { setAmount(e.currentTarget.value) }}></Input>
                 </FlexBoxRow>
-                <FlexBoxRow style={{"justifyContent": "center", "width": "100%"}}>
-                  <Button onClick={transfer}>
+                <FlexBoxRow style={{"justifyContent": "center", "width": "100%", "marginTop": "20px"}}>
+                  <Button style={{"width": "70%"}} onClick={transfer}>
                     Transfer
                   </Button>
                 </FlexBoxRow>
