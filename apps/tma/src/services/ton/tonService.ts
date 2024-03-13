@@ -1,12 +1,11 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, external, MessageRelaxed, storeMessageRelaxed, storeMessage} from '@ton/core';
-import * as fs from "fs";
+import { Address, beginCell, SendMode, Cell, external, contractAddress, ContractProvider, internal, MessageRelaxed, storeMessageRelaxed, storeMessage} from '@ton/core';
 import { Network, Tonfura } from "tonfura-sdk"
 
 const TONFURA_KEY = "";
 
 const tonfura = new Tonfura({
     apiKey: TONFURA_KEY,
-    network: Network.Testnet,
+    network: Network.Mainnet,
   });
 
 export type AuthenWalletConfig = {
@@ -69,6 +68,16 @@ export class AuthenWallet {
         }
     }
 
+    createTransferInternalMessage(value: number, to: string) {
+        return internal(
+            {
+                value: BigInt(value),
+                to: to,
+                body: beginCell().endCell(),
+            }
+        )
+    }
+
     createUnsignedMessage(args: { seqno: any; sendMode: any; messages: MessageRelaxed[]; }) {
         var resCell = beginCell()
         .storeUint(this.walletId, 32)
@@ -89,10 +98,10 @@ export class AuthenWallet {
             resCell.storeRef(beginCell().store(storeMessageRelaxed(m)));
         }
 
-        return resCell
+        return resCell.endCell()
     }
 
-    /* async send2back(signedMessage: Cell) {
+    async send2back(signedMessage: Cell) {
         const externalMessage = external({
             to: this.address,
             init: null,
@@ -105,5 +114,5 @@ export class AuthenWallet {
         .toBoc();
 
         await tonfura.transact.sendBoc(boc.toString("base64"));
-    } */
+    }
 }

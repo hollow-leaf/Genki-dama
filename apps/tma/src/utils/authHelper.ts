@@ -108,7 +108,7 @@ export function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
   return bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0;
 }
 
-async function signMessage(message: Uint8Array, authenId: string) {
+export async function signMessage(message: Uint8Array, authenId: string) {
   const fetched = localStorage.getItem(authenId);
     if (!fetched) {
       throw new Error("Credential not stored. Please try registering again!");
@@ -202,7 +202,7 @@ async function signMessage(message: Uint8Array, authenId: string) {
       return ""
     }
     //return what
-    return {clientDataJSON: clientDataJSON, authenticationResponse: authenticationResponse}
+    return {clientDataJSON: clientDataJSON, authenticationResponse: authenticationResponse, Signature: updatedSignature}
   } catch(e) {
     console.log(e)
     return ""

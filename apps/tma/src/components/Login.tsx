@@ -13,14 +13,19 @@ import {
 } from "@simplewebauthn/browser";
 import { getBalanceByAddr, updateAddressBytelegramId } from "../services/api";
 import { AuthenWallet } from "../services/ton/tonService";
+import { createPortal } from "react-dom";
+import { Modal } from "./modal";
 
 export function Login() {
-  const [publicKey, setPublicKey] = useState("");
+  const [publicKey, setPublicKey] = useState<string>("");
   const [keyid, setKeyId] = useState("");
   const [error, setError] = useState("");
   const [telegramId, setTelegramId] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [balance, setBalance] = useState<number>(0);
+  const [miniAppUrl, setMiniAppUrl] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+
 
 
   useEffect(() => {
@@ -29,6 +34,7 @@ export function Login() {
     let searchData = new URLSearchParams(search).get('_data_') || 'query';
     let queryParameter = new URLSearchParams(searchData)
     setTelegramId(queryParameter.get('telegramId') || "")
+    setMiniAppUrl(queryParameter.get('miniAppURL') || "")
   }, [])
 
   // webauthn registration
@@ -75,10 +81,15 @@ export function Login() {
           counter,
         })
       );
+      const pk = compressPublicKey(publicKey)
+      const _addr = getContractAddrByPk(pk)
+      const _balance:any = await getBalanceByAddr(_addr)
 
       localStorage.setItem("user-registered", id);
       setKeyId(id);
-      setPublicKey(publicKey)
+      setPublicKey(pk)
+      setAddress(_addr)
+      setBalance(Math.floor(Number(_balance)/10**5)/10000)
     } catch (e) {
       setError((e as any).message || "An unknown error occured");
     }
@@ -92,9 +103,10 @@ export function Login() {
         const _publicKey = decodeFirst<any>(
           Uint8Array.from(authenticator.credentialPublicKey)
         );
-        const _addr = getContractAddrByPk(_publicKey)
-        const _balance:any = await getBalanceByAddr("UQCjtNnN9XeH2T12uHGdzpDN-iFNKNWapI1jWgJoXvWP-ZoT")
-        setPublicKey(_publicKey)
+        const pk = compressPublicKey(_publicKey)
+        const _addr = getContractAddrByPk(pk)
+        const _balance:any = await getBalanceByAddr(_addr)
+        setPublicKey(pk)
         setKeyId(id)
         setAddress(_addr)
         setBalance(Math.floor(Number(_balance)/10**5)/10000)
@@ -126,12 +138,15 @@ export function Login() {
       const _publicKey = decodeFirst<any>(
         Uint8Array.from(authenticator.credentialPublicKey)
       );
+
       
-      const _addr = getContractAddrByPk(_publicKey)
+      const pk = compressPublicKey(_publicKey)
+      const _addr = getContractAddrByPk(pk)
+      console.log(pk, pk.length)
       const _balance:any = await getBalanceByAddr(_addr)
       localStorage.setItem("user-registered", authenticationResponse.id);
       setKeyId(authenticationResponse.id);
-      setPublicKey(_publicKey)
+      setPublicKey(pk)
       setAddress(_addr);
       setBalance(Math.floor(Number(_balance)/10**5)/10000)
     } catch (e) {
@@ -140,22 +155,27 @@ export function Login() {
   }
 
   async function connect() {
-    const pk = compressPublicKey(publicKey)
+    const pk = (publicKey)
     const authenWallet = new AuthenWallet(0 ,pk, 9453)
-    updateAddressBytelegramId(telegramId, publicKey, authenWallet.address.toString())
+    await updateAddressBytelegramId(telegramId, pk, authenWallet.address.toString(), keyid)
+    window.open(miniAppUrl)
   }
 
   function logout() {
     localStorage.removeItem("user-registered");
     setKeyId("");
     setPublicKey("")
+    setAddress("");
+    setBalance(0);
   }
+
+  const closeModal = () => {setLoading(false)}
 
   return (
     <Card>
       <FlexBoxCol>
         <h3>Authen Wallet</h3>
-          {keyid!=""&&telegramId==""?
+          {keyid!=""?
           <>
            <p>Address: {address}</p>
            <p>Balance: {balance} Ton</p>
@@ -189,14 +209,14 @@ export function Login() {
           </FlexBoxRow>
           }
       </FlexBoxCol>
+      {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </Card>
   );
 }
 
 function getContractAddrByPk(publicKey: any) {
   try {
-    const pk = compressPublicKey(publicKey)
-    const authenWallet = new AuthenWallet(0 ,pk, 9453)
+    const authenWallet = new AuthenWallet(0 ,publicKey, 9453)
     return authenWallet.address.toString()
   } catch(e) {
     console.log(e)
