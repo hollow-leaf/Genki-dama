@@ -1,24 +1,14 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components";
-import { SendMode } from "@ton/core";
-import { useTonConnect } from "../hooks/useTonConnect";
+import { SendMode, beginCell } from "@ton/core";
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
-import { useSearchParams } from "react-router-dom";
-import { decodeFirst, concatUint8Arrays, parseAuthenticatorData, shouldRemoveLeadingZero, signMessage } from "../utils/authHelper"
-import {
-  generateAuthenticationOptions,
-  verifyAuthenticationResponse,
-} from "@simplewebauthn/server";
-import base64 from "@hexagon/base64";
-import { ECDSASigValue } from "@peculiar/asn1-ecc";
-import { AsnParser } from "@peculiar/asn1-schema";
-import {
-  startAuthentication,
-} from "@simplewebauthn/browser";
 import { AuthenWallet } from "../services/ton/tonService";
+import { signMessage } from "../utils/authHelper";
+import { createPortal } from "react-dom";
+import { Modal } from "./modal";
+import { updateTxResult } from "../services/api";
 
 export function TransferTon() {
-  const [error, setError] = useState("");
+  const [hashedTxDataLabel, setHashedTxDataLabel] = useState("");
   const [miniAppUrl, setMiniAppUrl] = useState("");
   const [miniAppToken, setMiniAppToken] = useState("");
   const [tonAmount, setTonAmount] = useState("");
@@ -27,6 +17,8 @@ export function TransferTon() {
   const [balance, setBalance] = useState<number>(0);
   const [publicKey, setPublicKey] = useState("");
   const [authenId, setAuthenId] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   useEffect(() => {
     let search = window.location.search;
@@ -38,35 +30,35 @@ export function TransferTon() {
     setTonAmount(queryParameter.get('amount') || "")
     setPublicKey(queryParameter.get('publicKey') || "")
     setAuthenId(queryParameter.get('authenId') || "")
+    setHashedTxDataLabel(queryParameter.get('hashedTxDataLabel') || "")
   }, [])
 
-  function compressPublicKey(pubKeyX: any, pubKeyY: any) {
-    const yBit = pubKeyY % 2n === 0n ? 0x02 : 0x03;
-    const compressedPubKey = [yBit].concat(pubKeyX);
-    return compressedPubKey.map(x => x.toString(16).padStart(2, '0')).join('');
-  }
-
-  // webauthn authenticate
-  const transferTon = async (payload: any) => {
-    // TODO: Send Token to Recipient via Ton network
-    console.log("Send Signature")
-    console.log(payload.hashedMessage)
-    console.log(payload.publickey)
-    console.log(payload.txSignature)
-  }
+  const closeModal = () => {setLoading(false)}
 
   const transfer = async () => {
     // Mock Transaction
     const authenWallet = new AuthenWallet(0, publicKey, 9453);
     const internalMessage = authenWallet.createTransferInternalMessage(Number(tonAmount), tonRecipient);
     const unsignedMessage = authenWallet.createUnsignedMessage({sendMode:SendMode.PAY_GAS_SEPARATELY, seqno:0, messages: [internalMessage]})
+    let utf8Encode = new TextEncoder();
     const transaction = new Uint8Array(111);
     transaction[0] = 42;
-    const authenResult = await signMessage(transaction, authenId)
+    const authenResult = await signMessage(utf8Encode.encode(unsignedMessage.bits.toString()), authenId)
+    setLoading(true)
     if(authenResult != "") {
-      console.log(authenResult.Signature.length)
+      const signedBody= beginCell()
+      .storeUint(BigInt('0x' + Array.from(authenResult.Signature).map(x => x.toString(16).padStart(2, '0')).join('').substring(0, 64)), 256)
+      .storeUint(BigInt('0x' + Array.from(authenResult.Signature).map(x => x.toString(16).padStart(2, '0')).join('').substring(64, 128)), 256)
+      .storeBuilder(unsignedMessage.asBuilder())
+      .endCell()
+      await authenWallet.send2back(signedBody)
+      await updateTxResult(hashedTxDataLabel)
+      setLoading(false)
+    } else {
+      setLoading(false)
+      alert("Signed failed")
     }
-    //window.open(miniAppUrl)
+    window.open(miniAppUrl)
   }
 
   return (
@@ -97,6 +89,7 @@ export function TransferTon() {
           Transfer
         </Button>
       </FlexBoxCol>
+      {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </Card>
   );
 }

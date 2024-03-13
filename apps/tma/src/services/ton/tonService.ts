@@ -113,6 +113,10 @@ export class AuthenWallet {
         .endCell()
         .toBoc();
 
-        await tonfura.transact.sendBoc(boc.toString("base64"));
+        try {
+            await tonfura.transact.sendBoc(boc.toString("base64"));
+        } catch(e) {
+            console.log(e)
+        }
     }
 }

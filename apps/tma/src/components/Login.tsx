@@ -142,7 +142,6 @@ export function Login() {
       
       const pk = compressPublicKey(_publicKey)
       const _addr = getContractAddrByPk(pk)
-      console.log(pk, pk.length)
       const _balance:any = await getBalanceByAddr(_addr)
       localStorage.setItem("user-registered", authenticationResponse.id);
       setKeyId(authenticationResponse.id);
