@@ -130,6 +130,7 @@ export function Home() {
         await getTxResult(HashedTxDataLabel).then((res:any) => {
           if(res.result == "success") {
             txResult = "success"
+            showAlert("Message Sent!")
             setLoading(false)
           } else if(res.result == "failed") {
             txResult = "failed"

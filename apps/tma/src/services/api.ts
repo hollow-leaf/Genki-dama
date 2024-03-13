@@ -8,9 +8,14 @@ const tonfura = new Tonfura({
 });
 
 export async function getBalanceByAddr(addr: string) {
-    const addressBalance = await tonfura.core.getAddressBalance(addr);
-    console.log(addressBalance)
-    return addressBalance.data.result
+    try {
+        const addressBalance = await tonfura.core.getAddressBalance(addr);
+        console.log(addressBalance)
+        return addressBalance.data.result
+    } catch(e) {
+        console.log(e)
+        return 0
+    }
 }
 
 //serverless call
