@@ -5,7 +5,7 @@ const TONFURA_KEY = "";
 
 const tonfura = new Tonfura({
     apiKey: TONFURA_KEY,
-    network: Network.Mainnet,
+    network: Network.Testnet,
   });
 
 export type AuthenWalletConfig = {

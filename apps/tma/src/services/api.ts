@@ -1,10 +1,10 @@
 import  { Network, Tonfura } from "tonfura-sdk";
 
 //Tonfura api call
-const  TONFURA_KEY  = "179dee90-80aa-494c-ad5a-c427bac8d475";
+const  TONFURA_KEY  = "fd3d7559-c4c2-4cab-8131-d46a95d77f76";
 const tonfura = new Tonfura({
     apiKey: TONFURA_KEY,
-    network: Network.Mainnet,
+    network: Network.Testnet,
 });
 
 export async function getBalanceByAddr(addr: string) {
