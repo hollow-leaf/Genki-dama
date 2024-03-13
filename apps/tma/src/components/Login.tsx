@@ -157,7 +157,7 @@ export function Login() {
     const pk = (publicKey)
     const authenWallet = new AuthenWallet(0 ,pk, 9453)
     await updateAddressBytelegramId(telegramId, pk, authenWallet.address.toString(), keyid)
-    window.open(miniAppUrl)
+    window.location.href = (miniAppUrl)
   }
 
   function logout() {
