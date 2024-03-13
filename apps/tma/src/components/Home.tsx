@@ -169,7 +169,7 @@ export function Home() {
           {address != "" ? (
             <div>
               <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "marginTop": "60px","width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
-              <div className= "madimi-one-regular" style={{ "marginBottom": "40px", "width": "100%", "textAlign": "center", "color": "GrayText" }}>{formatAddr(address)}</div>
+              <div className= "madimi-one-regular" style={{ "marginBottom": "40px", "width": "100%", "textAlign": "center", "color": "gray" }}>{formatAddr(address)}</div>
               <FlexBoxCol>
                 <FlexBoxRow>
                   <Input placeholder="Recipient" onChange={(e) => { setRecipient(e.currentTarget.value) }}></Input>
