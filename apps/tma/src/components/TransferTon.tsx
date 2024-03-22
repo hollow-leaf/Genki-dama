@@ -40,6 +40,7 @@ export function TransferTon() {
       alert("Error Recipient Address")
       return
     }
+    console.log(tonAmount)
     // Mock Transaction
     const authenWallet = new AuthenWallet(0, publicKey, 9453);
     const internalMessage = authenWallet.createTransferInternalMessage(Number(tonAmount), tonRecipient);
@@ -62,25 +63,25 @@ export function TransferTon() {
       setLoading(false)
       alert("Signed failed")
     }
-    window.location.href = (miniAppUrl)
+    //window.location.href = (miniAppUrl)
   }
 
   return (
     <Card>
       <FlexBoxCol>
-        <h3>Transfer TON</h3>
+        <h3 style={{ "marginBottom": "10px", "marginTop": "30px","width": "100%", "textAlign": "center", "fontSize": "40px"}}>Transfer TON</h3>
         <FlexBoxRow>
-          <label>To </label>
+          <label style={{ "marginRight": "8",  "marginBottom": "5px", "marginTop": "60px", "textAlign": "center", "fontSize": "20px" }}>To </label>
           <Input
-            style={{ marginRight: 8 }}
+            style={{ "marginRight": "8",  "marginBottom": "5px", "marginTop": "60px","width": "100%", "textAlign": "center", "fontSize": "15px" }}
             value={tonRecipient}
             onChange={(e) => setTonRecipient(e.target.value)}
           ></Input>
         </FlexBoxRow>
         <FlexBoxRow>
-          <label>Amount </label>
+          <label style={{ "marginRight": "8",  "marginBottom": "10px", "marginTop": "20px", "textAlign": "center", "fontSize": "20px" }}>Amount </label>
           <Input
-            style={{ marginRight: 8 }}
+            style={{ "marginRight": "8",  "marginBottom": "10px", "marginTop": "20px","width": "80%", "textAlign": "center", "fontSize": "15px" }}
             type="number"
             value={tonAmount}
             onChange={(e) => setTonAmount(e.target.value)}
@@ -90,7 +91,7 @@ export function TransferTon() {
           style={{ marginTop: 18 }}
           onClick={transfer}
         >
-          Transfer
+          Sign Transaction
         </Button>
       </FlexBoxCol>
       {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
