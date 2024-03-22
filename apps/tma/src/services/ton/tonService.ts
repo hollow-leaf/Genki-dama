@@ -1,7 +1,7 @@
 import { Address, beginCell, SendMode, Cell, external, contractAddress, ContractProvider, internal, MessageRelaxed, storeMessageRelaxed, storeMessage} from '@ton/core';
 import { Network, Tonfura } from "tonfura-sdk"
 
-const TONFURA_KEY = "";
+const TONFURA_KEY = "fd3d7559-c4c2-4cab-8131-d46a95d77f76";
 
 const tonfura = new Tonfura({
     apiKey: TONFURA_KEY,

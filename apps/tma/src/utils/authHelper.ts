@@ -140,6 +140,8 @@ export async function signMessage(message: Uint8Array, authenId: string) {
       true
     );
 
+    console.log((authenticationResponse.response))
+
     const hashedClientData = await window.crypto.subtle.digest(
       "SHA-256",
       clientDataJSON

@@ -15,6 +15,9 @@ import { getBalanceByAddr, updateAddressBytelegramId } from "../services/api";
 import { AuthenWallet } from "../services/ton/tonService";
 import { createPortal } from "react-dom";
 import { Modal } from "./modal";
+import { formatAddr } from "../utils/utils";
+import { Wallet } from "./wallet";
+import { Connect, connectModal } from "./Connect";
 
 export function Login() {
   const [publicKey, setPublicKey] = useState<string>("");
@@ -139,15 +142,21 @@ export function Login() {
         Uint8Array.from(authenticator.credentialPublicKey)
       );
 
-      
-      const pk = compressPublicKey(_publicKey)
-      const _addr = getContractAddrByPk(pk)
-      const _balance:any = await getBalanceByAddr(_addr)
+      try{
+        setLoading(true)
+        const pk = compressPublicKey(_publicKey)
+        const _addr = getContractAddrByPk(pk)
+        const _balance:any = await getBalanceByAddr(_addr)
+        setPublicKey(pk)
+        setAddress(_addr);
+        setBalance(Math.floor(Number(_balance)/10**5)/10000)
+        setLoading(false)
+      } catch(ee) {
+        setLoading(false)
+        console.log(ee)
+      }
       localStorage.setItem("user-registered", authenticationResponse.id);
       setKeyId(authenticationResponse.id);
-      setPublicKey(pk)
-      setAddress(_addr);
-      setBalance(Math.floor(Number(_balance)/10**5)/10000)
     } catch (e) {
       console.log(e)
     }
@@ -171,27 +180,21 @@ export function Login() {
   const closeModal = () => {setLoading(false)}
 
   return (
-    <Card style={{"height": "100%"}} >
+    <Card style={{"height": "100%"}} className= "madimi-one-regular">
       <FlexBoxCol>
-        <h3>Authen Wallet</h3>
-          {keyid!=""?
-          <>
-           <p>Address: {address}</p>
-           <p>Balance: {balance} Ton</p>
-          </>
-          :
-          <></>
-          }
-          {keyid!=""&&telegramId!=""?
-          <FlexBoxRow>
-            <Button onClick={connect}>
-              Connect Wallet
-            </Button>
-          </FlexBoxRow>
-          :
-          <></>
-          }
-          {keyid==""?
+        <FlexBoxRow className="justify-between">
+          <h3>Authen Wallet</h3>
+            {keyid==""?
+              <></>
+              :
+              <div>
+                <button className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={logout}>
+                  Logout
+                </button>
+              </div>
+            }
+        </FlexBoxRow>
+        {keyid==""?
           <FlexBoxRow>
             <Button onClick={createNewCredential}>
               Register new account
@@ -201,12 +204,20 @@ export function Login() {
             </Button>
           </FlexBoxRow>
           :
-          <FlexBoxRow>
-            <Button onClick={logout}>
-              Logout
-            </Button>
-          </FlexBoxRow>
+          <></>
+        }
+        {keyid!=""?
+          <Wallet address={address} balance={balance} />
+          :
+          <></>
           }
+          {keyid!=""&&telegramId!=""?
+          <FlexBoxRow>
+            <Connect connecthandler={connect} />
+          </FlexBoxRow>
+          :
+          <></>
+        }
       </FlexBoxCol>
       {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </Card>
