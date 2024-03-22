@@ -1,6 +1,7 @@
 import { Modal } from 'flowbite';
 import type { ModalOptions, ModalInterface } from 'flowbite';
 import type { InstanceOptions } from 'flowbite';
+import { FlexBoxRow } from './styled/styled';
 
 export function connectModal() {
     const $modalElement: any = document.querySelector('#connectModal');
@@ -98,13 +99,15 @@ export function Connect(prop:any) {
                 <div className="relative p-4 w-full max-w-md max-h-full">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                            <h3 className="w-full text-center text-xl font-semibold text-gray-900 dark:text-white">
                                 Wallet Connect
                             </h3>
                         </div>
                         <div className="p-4 md:p-5">
-                            <button type="submit" onClick={prop.connecthandler} className="w-full mb-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Connect</button>
-                            <button type="submit" onClick={()=>{cancel()}} className="w-full opacity-40 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Cancel</button>
+                            <FlexBoxRow>
+                                <button type="submit" onClick={prop.connecthandler} className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Connect</button>
+                                <button type="submit" onClick={()=>{cancel()}} className="w-full opacity-80 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Cancel</button>
+                            </FlexBoxRow>
                         </div>
                     </div>
                 </div>

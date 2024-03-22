@@ -14,7 +14,7 @@ import {
 import { getBalanceByAddr, updateAddressBytelegramId } from "../services/api";
 import { AuthenWallet } from "../services/ton/tonService";
 import { createPortal } from "react-dom";
-import { Modal } from "./modal";
+import { Modall } from "./modal";
 import { formatAddr } from "../utils/utils";
 import { Wallet } from "./wallet";
 import { Connect, connectModal } from "./Connect";
@@ -180,7 +180,7 @@ export function Login() {
   const closeModal = () => {setLoading(false)}
 
   return (
-    <Card style={{"height": "100%"}} className= "madimi-one-regular">
+    <Card style={{"height": window.innerHeight, "backgroundColor": "rgba(39, 40, 46)", maxWidth: "400px"}} className= "madimi-one-regular">
       <FlexBoxCol>
         <FlexBoxRow className="justify-between">
           <h3>Authen Wallet</h3>
@@ -207,7 +207,7 @@ export function Login() {
           <></>
         }
         {keyid!=""?
-          <Wallet address={address} balance={balance} />
+          <Wallet address={address} balance={balance} publicKey={publicKey} authenId={keyid}/>
           :
           <></>
           }
@@ -219,7 +219,7 @@ export function Login() {
           <></>
         }
       </FlexBoxCol>
-      {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
+      {loading&&createPortal(<Modall closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </Card>
   );
 }

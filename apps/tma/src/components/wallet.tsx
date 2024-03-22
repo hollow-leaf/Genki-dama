@@ -1,6 +1,8 @@
 import { useEffect, useState,  } from "react";
 import { formatAddr } from "../utils/utils";
 import { FlexBoxCol, FlexBoxRow } from "./styled/styled";
+import { TokenList } from "./TokenList";
+import { OpenTransferModal, Transfer } from "./Transfer";
 
 export function Wallet(prop:any) {
 
@@ -10,7 +12,7 @@ export function Wallet(prop:any) {
             <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "marginTop": "60px","width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(prop.balance)/10**5)/10000} Ton</div>
             <div className= "madimi-one-regular" style={{ "marginBottom": "20px", "width": "100%", "textAlign": "center", "color": "gray" }}>{formatAddr(prop.address)}</div>
             <FlexBoxCol>
-                <FlexBoxRow className="px-6 justify-between madimi-one-regular" style={{"textAlign": "center"}}>
+                <FlexBoxRow className="rounded-2xl py-3 px-6 justify-between madimi-one-regular" style={{"textAlign": "center", "backgroundColor": "rgba(50, 90, 168, 0.4)" }}>
                     <div>
                         <div className="flex justify-center">
                             <button type="button" className="mb-2 text-white bg-tgblue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-tgblue dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -33,7 +35,7 @@ export function Wallet(prop:any) {
                 
                     <div>
                         <div className="flex justify-center">
-                            <button type="button" className="mb-2 text-white bg-tgblue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-tgblue dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            <button onClick={OpenTransferModal} type="button" className="mb-2 text-white bg-tgblue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-tgblue dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                             <svg
                             width="24"
                             height="24"
@@ -87,8 +89,8 @@ export function Wallet(prop:any) {
                             >
                             <path d="M13 16H11V18H13V16Z" fill="currentColor" />
                             <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
+                                fillRule="evenodd"
+                                clipRule="evenodd"
                                 d="M5 4C5 2.89543 5.89543 2 7 2H17C18.1046 2 19 2.89543 19 4V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V4ZM7 4H17V20H7L7 4Z"
                                 fill="currentColor"
                             />
@@ -98,6 +100,8 @@ export function Wallet(prop:any) {
                         
                         <p className="text-xs">Devices</p>
                     </div>
+                    <TokenList></TokenList>
+                    <Transfer publicKey={prop.publicKey} authenId={prop.authenId}></Transfer>
                 </FlexBoxRow>
             </FlexBoxCol>
         </>

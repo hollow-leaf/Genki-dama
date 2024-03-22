@@ -2,7 +2,7 @@ import React from "react";
 import {MoonLoader} from "react-spinners"
 
 
-export const Modal = (props: any) => {
+export const Modall = (props: any) => {
   return (
     <div
       className="modal-container"
