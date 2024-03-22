@@ -4,7 +4,7 @@ import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import { AuthenWallet } from "../services/ton/tonService";
 import { signMessage } from "../utils/authHelper";
 import { createPortal } from "react-dom";
-import { Modal } from "./modal";
+import { Modall } from "./modal";
 import { updateTxResult } from "../services/api";
 
 export function TransferTon() {
@@ -63,7 +63,7 @@ export function TransferTon() {
       setLoading(false)
       alert("Signed failed")
     }
-    //window.location.href = (miniAppUrl)
+    window.location.href = (miniAppUrl)
   }
 
   return (
@@ -94,7 +94,7 @@ export function TransferTon() {
           Sign Transaction
         </Button>
       </FlexBoxCol>
-      {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
+      {loading&&createPortal(<Modall closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </Card>
   );
 }

@@ -8,7 +8,7 @@ import { useTonConnect } from "../hooks/useTonConnect";
 import { buildConnectUrl, buildTransferUrl } from "../utils/urlHelper"
 import { deleteBytelegramId, getAddressBytelegramId, getBalanceByAddr, getTxResult } from "../services/api";
 import { createPortal } from "react-dom";
-import { Modal } from "./modal";
+import { Modall } from "./modal";
 import { mnemonicToWalletKey } from "ton-crypto";
 import { formatAddr } from "../utils/utils";
 
@@ -200,7 +200,7 @@ export function Home() {
           )}
         </FlexBoxCol >
       </Card >
-     {loading&&createPortal(<Modal closeModal= {closeModal} message= {"Loading"} />, document.body)}
+     {loading&&createPortal(<Modall closeModal= {closeModal} message= {"Loading"} />, document.body)}
     </>
   );
 }
