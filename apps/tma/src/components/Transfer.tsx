@@ -122,7 +122,7 @@ export function Transfer(props:any) {
     let utf8Encode = new TextEncoder();
     const transaction = new Uint8Array(111);
     transaction[0] = 42;
-    const authenResult = await signMessage(utf8Encode.encode(unsignedMessage.bits.toString()), authenId)
+    const authenResult = await signMessage(unsignedMessage.hash(), authenId)
     setLoading(true)
     if(authenResult != "" && authenResult != undefined) {
       const signedBody= beginCell()
