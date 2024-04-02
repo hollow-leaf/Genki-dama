@@ -163,7 +163,7 @@ export function Wallet(prop:any) {
                         <p className="text-xs">Devices</p>
                     </div>
                     <TokenList></TokenList>
-                    <Transfer publicKey={prop.publicKey} authenId={prop.authenId}></Transfer>
+                    <Transfer publicKey={prop.publicKey} authenId={prop.authenId} OpenTransferModal={OpenTransferModal}></Transfer>
                     </>
                 }
                 </FlexBoxRow>
