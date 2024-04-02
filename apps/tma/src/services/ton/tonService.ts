@@ -1,4 +1,4 @@
-import { Address, beginCell, SendMode, Cell, external, contractAddress, ContractProvider, internal, MessageRelaxed, storeMessageRelaxed, storeMessage} from '@ton/core';
+import { Address, beginCell, SendMode, Cell, external, contractAddress, ContractProvider, internal, MessageRelaxed, storeMessageRelaxed, storeMessage } from '@ton/core';
 import { Network, Tonfura } from "tonfura-sdk"
 
 const TONFURA_KEY = "fd3d7559-c4c2-4cab-8131-d46a95d77f76";
@@ -68,6 +68,22 @@ export class AuthenWallet {
         }
     }
 
+    async getBindingMainWallet(provider: ContractProvider) {
+        let state = await provider.getState();
+
+        //TODO: Editing value parsing
+        /* if (state.state.type === 'active') {
+            let res = await provider.get('BindingMainWallet', []);
+            return res.stack.readNumber();
+        }
+        else {
+            return 0;
+        } */
+
+        //Only for testing
+        return ""
+    }
+
     createTransferInternalMessage(value: number, to: string) {
         return internal(
             {
@@ -120,3 +136,4 @@ export class AuthenWallet {
         }
     }
 }
+
