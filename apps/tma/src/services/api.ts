@@ -184,10 +184,7 @@ export async function createNewMainWallet(publicKey: string):Promise<string> {
     const ra = Math.floor(Math.random() * 1000000)
     const aut = new AuthenWallet(0, publicKey, ra)
 
-    const successful = await updateWalletAddressPublicKey(publicKey, aut.address.toString())
-
-    await new Promise( resolve => setTimeout(resolve, 1000) );
-    
+    const successful = await updateWalletAddressPublicKey(publicKey, aut.address.toString())    
 
     if(successful) {
         return aut.address.toString()
