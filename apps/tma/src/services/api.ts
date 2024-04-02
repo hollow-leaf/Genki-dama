@@ -1,4 +1,5 @@
 import  { Network, Tonfura } from "tonfura-sdk";
+import { AuthenWallet } from "./ton/tonService";
 
 //Tonfura api call
 const  TONFURA_KEY  = "fd3d7559-c4c2-4cab-8131-d46a95d77f76";
@@ -128,5 +129,66 @@ export async function updateTxResult(hashedTxDataLabel: string) {
     }
     catch (err) {
         console.log("error", err);
+    }
+}
+
+export async function getWalletAddressPublicKey(publicKey: string) {
+    try {
+        let body = {
+            "publicKey": publicKey
+        }
+        const res = await fetch(HOST + '/walletAddressByPubicKey', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          })
+        if(res){
+            const rres = await res.json()
+            return {publicKey: rres.publicKey, contractAddress: rres.contractAddress}
+        }else{
+            return {publicKey: "", contractAddress: ""}
+        }
+    }
+    catch (err) {
+        console.log("error", err);
+        //for testing
+        return {publicKey: "", contractAddress: ""}
+    }
+}
+
+export async function updateWalletAddressPublicKey(publicKey: string, contractAddress: string) {
+    try {
+        let body = {
+            "publicKey": publicKey,
+            "contractAddress": contractAddress
+        }
+        const res = await fetch(HOST + '/updateWalletAddressByPubicKey', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+          })
+        if(res){
+            return true
+        }else{
+            return false
+        }
+    }
+    catch (err) {
+        console.log("error", err);
+        //for testing
+        return false
+    }
+}
+
+export async function createNewMainWallet(publicKey: string):Promise<string> {
+    const ra = Math.floor(Math.random() * 1000000)
+    const aut = new AuthenWallet(0, publicKey, ra)
+
+    const successful = await updateWalletAddressPublicKey(publicKey, aut.address.toString())    
+
+    if(successful) {
+        return aut.address.toString()
+    }else {
+        return ""
     }
 }

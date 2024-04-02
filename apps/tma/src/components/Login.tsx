@@ -11,7 +11,7 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import { getBalanceByAddr, updateAddressBytelegramId } from "../services/api";
+import { getBalanceByAddr, getWalletAddressPublicKey, updateAddressBytelegramId } from "../services/api";
 import { AuthenWallet } from "../services/ton/tonService";
 import { createPortal } from "react-dom";
 import { Modall } from "./modal";
@@ -25,6 +25,7 @@ export function Login() {
   const [error, setError] = useState("");
   const [telegramId, setTelegramId] = useState<string>("");
   const [address, setAddress] = useState<string>("");
+  const [mainWalletAdress, setMainWalletAdress] = useState<string>("");
   const [balance, setBalance] = useState<number>(0);
   const [miniAppUrl, setMiniAppUrl] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,8 +41,10 @@ export function Login() {
     setMiniAppUrl(queryParameter.get('miniAppURL') || "")
   }, [])
 
+  //TODO: Adding wallet binding check and api to finding binded main wallet address
+
   // webauthn registration
-  async function createNewCredential() {
+  async function register() {
     try {
       const timeNow = new Date()
       const generatedRegistrationOptions = await generateRegistrationOptions({
@@ -108,11 +111,17 @@ export function Login() {
         );
         const pk = compressPublicKey(_publicKey)
         const _addr = getContractAddrByPk(pk)
-        const _balance:any = await getBalanceByAddr(_addr)
         setPublicKey(pk)
         setKeyId(id)
         setAddress(_addr)
-        setBalance(Math.floor(Number(_balance)/10**5)/10000)
+        
+        //finding binding wallet
+        const _mainWalletAdress:any = await getWalletAddressPublicKey(pk)
+        setMainWalletAdress(_mainWalletAdress.contractAddress)
+        const _balance:any = await getBalanceByAddr(_addr)
+        if(_balance) {
+          setBalance(Math.floor(Number(_balance)/10**5)/10000)
+        }
       }
     }
     return
@@ -196,7 +205,7 @@ export function Login() {
         </FlexBoxRow>
         {keyid==""?
           <FlexBoxRow>
-            <Button onClick={createNewCredential}>
+            <Button onClick={register}>
               Register new account
             </Button>
             <Button onClick={login}>
@@ -207,7 +216,7 @@ export function Login() {
           <></>
         }
         {keyid!=""?
-          <Wallet address={address} balance={balance} publicKey={publicKey} authenId={keyid}/>
+          <Wallet address={mainWalletAdress} balance={balance} publicKey={publicKey} authenId={keyid} setLoading={setLoading} />
           :
           <></>
           }

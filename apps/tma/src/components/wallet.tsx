@@ -3,16 +3,78 @@ import { formatAddr } from "../utils/utils";
 import { FlexBoxCol, FlexBoxRow } from "./styled/styled";
 import { TokenList } from "./TokenList";
 import { OpenTransferModal, Transfer } from "./Transfer";
+import { createNewMainWallet, getWalletAddressPublicKey } from "../services/api";
+import { createPortal } from "react-dom";
+import { Modall } from "./modal";
 
 export function Wallet(prop:any) {
+    //TODO: issue =>
+    //Binding main wallet have to spend gas fee => 1. binding when first tx. 2. binding when first binding
 
+    const [mainWalletAdress, setMainWalletAdress] = useState<string>("");
+
+    useEffect(() => {
+        //finding binding wallet
+        _getWalletAddressPublicKey(prop.publicKey)
+        setMainWalletAdress(prop.address)
+      }, [])
+
+    function copyAddress() {
+        navigator.clipboard.writeText(mainWalletAdress);
+    }
+
+    async function _getWalletAddressPublicKey(pk: string) {
+        const _mainWalletAdress:any = await getWalletAddressPublicKey(pk)
+        //setMainWalletAdress(_mainWalletAdress.contractAddress)
+    }
+
+    async function createAccount() {
+        prop.setLoading(true)
+        const _mainWalletAdress = await createNewMainWallet(prop.publicKey)
+        if(_mainWalletAdress) {
+            setMainWalletAdress(_mainWalletAdress)
+        }
+        prop.setLoading(false)
+    }
 
     return (
         <>
             <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "marginTop": "60px","width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(prop.balance)/10**5)/10000} Ton</div>
-            <div className= "madimi-one-regular" style={{ "marginBottom": "20px", "width": "100%", "textAlign": "center", "color": "gray" }}>{formatAddr(prop.address)}</div>
+            <div onClick={copyAddress} className= "madimi-one-regular" style={{ "marginBottom": "20px", "width": "100%", "textAlign": "center", "color": "gray" }}>{prop.address == ""?formatAddr(mainWalletAdress):formatAddr(prop.address)}</div>
             <FlexBoxCol>
                 <FlexBoxRow className="rounded-2xl py-3 px-6 justify-between madimi-one-regular" style={{"textAlign": "center", "backgroundColor": "rgba(50, 90, 168, 0.4)" }}>
+                    {prop.address == "" && mainWalletAdress == "" ?
+                    <>
+                        <FlexBoxRow>
+                            <div className="flex justify-center">
+                                <button onClick={createAccount} type="button" className="text-white bg-tgblue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-tgblue dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0,0,256,256">
+                                    <g fill="#ffffff" fillRule="evenodd" stroke="none" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="miter" strokeMiterlimit="10" strokeDasharray="" strokeDashoffset="0" fontFamily="none" fontWeight="none" fontSize="none" textAnchor="none">
+                                        <g transform="scale(10.66667,10.66667)">
+                                            <path d="M11,2v9h-9v2h9v9h2v-9h9v-2h-9v-9z"></path>
+                                        </g>
+                                    </g>
+                                </svg>
+                                </button>
+                            </div>
+                            <p className="text-xs text-center ">Create account</p>
+                        </FlexBoxRow>
+                        <FlexBoxRow>
+                            <div className="flex justify-center">
+                                <button type="button" className="text-white bg-tgblue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-tgblue dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0,0,256,256">
+                                <g fill="#ffffff" fillRule="nonzero" stroke="none" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="miter" strokeMiterlimit="10" strokeDasharray="" strokeDashoffset="0" fontFamily="none" fontWeight="none" fontSize="none" textAnchor="none">
+                                    <g transform="scale(10.66667,10.66667)">
+                                        <path d="M19,3c-1.64501,0 -3,1.35499 -3,3c0,0.45986 0.11423,0.89194 0.30273,1.2832l-3.7168,3.7168h-4.77344c-0.41736,-1.15733 -1.51934,-2 -2.8125,-2c-1.64501,0 -3,1.35499 -3,3c0,1.64501 1.35499,3 3,3c1.29316,0 2.39514,-0.84267 2.8125,-2h4.77344l3.7168,3.7168c-0.18851,0.39126 -0.30273,0.82335 -0.30273,1.2832c0,1.64501 1.35499,3 3,3c1.64501,0 3,-1.35499 3,-3c0,-1.64501 -1.35499,-3 -3,-3c-0.45986,0 -0.89194,0.11422 -1.2832,0.30273l-3.30273,-3.30273l3.30274,-3.30273c0.39126,0.18851 0.82335,0.30273 1.2832,0.30273c1.64501,0 3,-1.35499 3,-3c0,-1.64501 -1.35499,-3 -3,-3zM19,5c0.56413,0 1,0.43587 1,1c0,0.56413 -0.43587,1 -1,1c-0.56413,0 -1,-0.43587 -1,-1c0,-0.56413 0.43587,-1 1,-1zM5,11c0.56413,0 1,0.43587 1,1c0,0.56413 -0.43587,1 -1,1c-0.56413,0 -1,-0.43587 -1,-1c0,-0.56413 0.43587,-1 1,-1zM19,17c0.56413,0 1,0.43587 1,1c0,0.56413 -0.43587,1 -1,1c-0.56413,0 -1,-0.43587 -1,-1c0,-0.56413 0.43587,-1 1,-1z"></path>
+                                    </g>
+                                </g>
+                                </svg>
+                                </button>
+                            </div>
+                            <p className="text-xs text-center ">Bind exist account</p>
+                        </FlexBoxRow>
+                    </>:
+                    <>
                     <div>
                         <div className="flex justify-center">
                             <button type="button" className="mb-2 text-white bg-tgblue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-tgblue dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -102,6 +164,8 @@ export function Wallet(prop:any) {
                     </div>
                     <TokenList></TokenList>
                     <Transfer publicKey={prop.publicKey} authenId={prop.authenId}></Transfer>
+                    </>
+                }
                 </FlexBoxRow>
             </FlexBoxCol>
         </>
