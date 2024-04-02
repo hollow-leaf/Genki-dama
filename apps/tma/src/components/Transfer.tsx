@@ -97,6 +97,8 @@ export function Transfer(props:any) {
         setPublicKey(queryParameter.get('publicKey') || "")
         setAuthenId(queryParameter.get('authenId') || "")
         setHashedTxDataLabel(queryParameter.get('hashedTxDataLabel') || "")
+        props.OpenTransferModal()
+
     }else {
         //using web
         setPublicKey(props.publicKey || "")
