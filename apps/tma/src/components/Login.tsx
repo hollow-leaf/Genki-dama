@@ -17,7 +17,7 @@ import { createPortal } from "react-dom";
 import { Modall } from "./modal";
 import { formatAddr } from "../utils/utils";
 import { Wallet } from "./wallet";
-import { Connect, connectModal } from "./Connect";
+import { cancel, Connect, connectModal } from "./Connect";
 
 export function Login() {
   const [publicKey, setPublicKey] = useState<string>("");
@@ -173,8 +173,12 @@ export function Login() {
 
   async function connect() {
     const pk = (publicKey)
-    const authenWallet = new AuthenWallet(0 ,pk, 9453)
-    await updateAddressBytelegramId(telegramId, pk, authenWallet.address.toString(), keyid)
+    if(mainWalletAdress=="") {
+      alert("You have to create account!")
+      cancel()
+      return
+    }
+    await updateAddressBytelegramId(telegramId, pk, mainWalletAdress, keyid)
     window.location.href = (miniAppUrl)
   }
 

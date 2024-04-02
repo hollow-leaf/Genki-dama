@@ -171,10 +171,10 @@ export function Home() {
               <div className= "madimi-one-regular" style={{ "marginBottom": "10px", "marginTop": "60px","width": "100%", "textAlign": "center", "fontSize": "40px"}}>{Math.floor(Number(balance)/10**5)/10000} Ton</div>
               <div className= "madimi-one-regular" style={{ "marginBottom": "40px", "width": "100%", "textAlign": "center", "color": "gray" }}>{formatAddr(address)}</div>
               <FlexBoxCol>
-                <FlexBoxRow>
+                <FlexBoxRow className="text-black">
                   <Input placeholder="Recipient" onChange={(e) => { setRecipient(e.currentTarget.value) }}></Input>
                 </FlexBoxRow>
-                <FlexBoxRow>
+                <FlexBoxRow className="text-black	">
                   <Input placeholder="Amount" onChange={(e) => { setAmount(e.currentTarget.value) }}></Input>
                 </FlexBoxRow>
                 <FlexBoxRow style={{"justifyContent": "center", "width": "100%", "marginTop": "20px"}}>
