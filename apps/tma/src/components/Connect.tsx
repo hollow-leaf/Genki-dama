@@ -34,7 +34,7 @@ export function connectModal() {
     modal.show();
 }
 
-function cancel() {
+export function cancel() {
     const $modalElement: any = document.querySelector('#connectModal');
 
     const modalOptions: ModalOptions = {
